@@ -1,4 +1,4 @@
-package main
+package utils
 
 func GenerateSearchCriteria(letters []rune) []string {
 	if letters == nil {
@@ -21,25 +21,25 @@ func powerSet(letters *[]rune) [][]rune {
 	return powerSet
 }
 
-func sortLettersAndConvert(sa *[][]rune) []string {
+func sortLettersAndConvert(powerSet *[][]rune) []string {
 	var result []string
-	for _, s := range *sa {
+	for _, s := range *powerSet {
 		SortLetters(&s)
 		result = append(result, string(s))
 	}
 	return result
 }
 
-func removeDuplicates(s []string) []string {
-	seen := make(map[string]struct{}, len(s))
+func removeDuplicates(powerSet []string) []string {
+	seen := make(map[string]struct{}, len(powerSet))
 	j := 0
-	for _, v := range s {
-		if _, ok := seen[v]; ok {
+	for _, s := range powerSet {
+		if _, ok := seen[s]; ok {
 			continue
 		}
-		seen[v] = struct{}{}
-		s[j] = v
+		seen[s] = struct{}{}
+		powerSet[j] = s
 		j++
 	}
-	return s[:j]
+	return powerSet[:j]
 }
