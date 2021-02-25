@@ -1,6 +1,10 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"words-microservice/controller"
+
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
 	r := gin.Default()
@@ -8,6 +12,8 @@ func main() {
 	r.GET("/ping", func(c *gin.Context) {
 		c.String(200, "pong!")
 	})
+
+	r.POST("/test", controller.SearchForWordsHandler)
 
 	r.Run(":3000")
 }
