@@ -1,5 +1,10 @@
 package utils
 
+import (
+	"math"
+	"strconv"
+)
+
 func GenerateSearchCriteria(letters []rune) []string {
 	if letters == nil {
 		return nil
@@ -11,12 +16,20 @@ func GenerateSearchCriteria(letters []rune) []string {
 
 func powerSet(letters *[]rune) [][]rune {
 	powerSet := [][]rune{[]rune{}}
-	for _, letter := range *letters {
-		var tmpSlice [][]rune
-		for _, tmp := range powerSet {
-			tmpSlice = append(tmpSlice, append(tmp, letter))
+	length := len(*letters)
+	total := math.Pow(2, float64(length))
+	for i := 0; i < int(total); i++ {
+		var tmpSet []rune
+		num := strconv.FormatInt(int64(i), 2)
+		for len(num) < length {
+			num = "0" + num
 		}
-		powerSet = append(powerSet, tmpSlice...)
+		for j := 0; j < len(num); j++ {
+			if num[j] == '1' {
+				tmpSet = append(tmpSet, (*letters)[j])
+			}
+		}
+		powerSet = append(powerSet, tmpSet)
 	}
 	return powerSet
 }

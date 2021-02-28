@@ -26,8 +26,8 @@ func SearchForWordsHandler(c *gin.Context) {
 
 	powerSet := utils.GenerateSearchCriteria([]rune(input.Letters))
 	findQuery := convertToQuery(&powerSet)
-
-	result := findMatchedWords(&findQuery)
+	foundDocuments := findMatchedWords(&findQuery)
+	result := utils.MapToOutput(&foundDocuments)
 	c.JSON(http.StatusOK, gin.H{"result": result})
 }
 

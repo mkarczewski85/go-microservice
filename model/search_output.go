@@ -1,6 +1,6 @@
 package model
 
 type WordSearchOutput struct {
-	word          string `json:"word"`
-	scrabbleScore uint16 `json:"scrabbleScore"`
+	Word          string `json:"word"`
+	ScrabbleScore uint16 `json:"scrabbleScore"`
 }

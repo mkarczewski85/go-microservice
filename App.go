@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"words-microservice/config"
 	"words-microservice/controller"
@@ -39,7 +38,7 @@ func main() {
 }
 
 func processError(err error) {
-	fmt.Println(err)
+	log.Error(err)
 	os.Exit(2)
 }
 
