@@ -1,6 +1,6 @@
 package config
 
-type GeneralConfig struct {
+type Config struct {
 	Server struct {
 		Port string `yaml:"port", envconfig:"SERVER_PORT"`
 		Host string `yaml:"host", envconfig:"SERVER_HOST"`

@@ -1,0 +1,10 @@
+# Server configurations
+server:
+  host: "localhost"
+  port: 3000
+
+# Database credentials
+database:
+  name: "wordsdb"
+  collection: "words"
+  uri: mongodb://localhost:27017

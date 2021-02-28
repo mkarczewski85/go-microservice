@@ -4,36 +4,33 @@ import (
 	"context"
 	"sync"
 
-	log "github.com/sirupsen/logrus"
+	"words-microservice/config"
 
+	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-
-	"words-microservice/config"
 )
 
-const CONNECTED = "Successfully connected to database: %v"
-const FAILED_TO_CONNECT = "Failed to connect to database: %v"
+const CONNECTED = "Successfully connected to database: %s"
+const FAILED_TO_CONNECT = "Failed to connect to database: %s"
 
 type MongoDatastore struct {
 	Database *mongo.Database
 	Session  *mongo.Client
-	Logger   *log.Logger
-	Config   *config.GeneralConfig
+	Config   *config.Config
 }
 
-func NewDatastore(config *config.GeneralConfig, logger *log.Logger) *MongoDatastore {
+func NewDatastore(config *config.Config) *MongoDatastore {
 	var mongoDataStore *MongoDatastore
-	db, session := connect(config, logger)
+	db, session := connect(config)
 	if db != nil && session != nil {
 		mongoDataStore = new(MongoDatastore)
 		mongoDataStore.Database = db
-		mongoDataStore.Logger = logger
 		mongoDataStore.Session = session
 		mongoDataStore.Config = config
 		return mongoDataStore
 	}
-	logger.Fatalf(FAILED_TO_CONNECT, config.Database.DatabaseName)
+	log.Fatalf(FAILED_TO_CONNECT, config.Database.DatabaseName)
 
 	return nil
 }
@@ -42,29 +39,33 @@ func (d MongoDatastore) GetWordsCollection() *mongo.Collection {
 	return d.Database.Collection(d.Config.Database.CollectionName)
 }
 
-func connect(generalConfig *config.GeneralConfig, logger *log.Logger) (a *mongo.Database, b *mongo.Client) {
+func connect(generalConfig *config.Config) (a *mongo.Database, b *mongo.Client) {
 	var connectOnce sync.Once
 	var db *mongo.Database
 	var session *mongo.Client
 	connectOnce.Do(func() {
-		db, session = connectToMongo(generalConfig, logger)
+		db, session = connectToMongo(generalConfig)
 	})
 
 	return db, session
 }
 
-func connectToMongo(generalConfig *config.GeneralConfig, logger *log.Logger) (a *mongo.Database, b *mongo.Client) {
+func connectToMongo(generalConfig *config.Config) (a *mongo.Database, b *mongo.Client) {
 	var err error
 	session, err := mongo.NewClient(options.Client().ApplyURI(generalConfig.Database.ConnectionUri))
 	if err != nil {
-		logger.Fatal(err)
+		log.Fatal(err)
 	}
 	session.Connect(context.TODO())
 	if err != nil {
-		logger.Fatal(err)
+		log.Fatal(err)
 	}
 	var DB = session.Database(generalConfig.Database.DatabaseName)
-	logger.Info(CONNECTED, generalConfig.Database.DatabaseName)
+	e := session.Ping(context.TODO(), nil)
+	if e != nil {
+		log.Fatal("Connection ping failed")
+	}
+	log.Info(CONNECTED, generalConfig.Database.DatabaseName)
 
 	return DB, session
 }

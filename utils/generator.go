@@ -27,7 +27,7 @@ func sortLettersAndConvert(powerSet *[][]rune) []string {
 		SortLetters(&s)
 		result = append(result, string(s))
 	}
-	return result
+	return result[1:]
 }
 
 func removeDuplicates(powerSet []string) []string {
