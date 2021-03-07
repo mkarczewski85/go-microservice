@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-func GenerateSearchCriteria(letters []rune) []string {
+func GetPowerset(letters []rune) []string {
 	if letters == nil {
 		return nil
 	}

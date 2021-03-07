@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"words-microservice/db"
 	"words-microservice/model"
-	"words-microservice/utils"
+	"words-microservice/service"
 
 	log "github.com/sirupsen/logrus"
 
@@ -24,15 +24,13 @@ func SearchForWordsHandler(c *gin.Context) {
 		return
 	}
 
-	powerSet := utils.GenerateSearchCriteria([]rune(input.Letters))
-	findQuery := convertToQuery(&powerSet)
+	findQuery := service.GenerateSearchCriteria(input)
 	foundDocuments := findMatchedWords(&findQuery)
-	result := utils.MapToOutput(&foundDocuments)
-	c.JSON(http.StatusOK, gin.H{"result": result})
+	c.JSON(http.StatusOK, gin.H{"result": foundDocuments})
 }
 
-func findMatchedWords(filters *bson.M) []bson.M {
-	var result []bson.M
+func findMatchedWords(filters *bson.M) []model.WordSearchOutput {
+	var result []model.WordSearchOutput
 	collection := Datastore.GetWordsCollection()
 	cur, err := collection.Find(context.TODO(), filters)
 	if err != nil {
@@ -41,7 +39,7 @@ func findMatchedWords(filters *bson.M) []bson.M {
 
 	defer cur.Close(context.TODO())
 	for cur.Next(context.TODO()) {
-		var entry bson.M
+		var entry model.WordSearchOutput
 		err = cur.Decode(&entry)
 		if err != nil {
 			log.Fatal("Error during decoding the document", err)
@@ -49,13 +47,4 @@ func findMatchedWords(filters *bson.M) []bson.M {
 		result = append(result, entry)
 	}
 	return result
-}
-
-func convertToQuery(powerSet *[]string) bson.M {
-	var arr bson.A
-	for _, s := range *powerSet {
-		arr = append(arr, s)
-	}
-	findQuery := bson.M{"sortedLetters": bson.M{"$in": arr}}
-	return findQuery
 }
